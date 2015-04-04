@@ -3,6 +3,8 @@ var webhook = require('express-ifttt-webhook');
 var urlParse = require('url-parse');
 var resolver = require("resolver");
 var GitHubAPI = require('github');
+var twitterAPI = require('node-twitter-api');
+
 
 var app = express();
 app.use(webhook(function (json, done) {
@@ -29,12 +31,13 @@ function processTweet(url, text, done) {
     var repo = match[2];
     var problem = match[3];
     console.log('@' + twitterUser + ' filed an issue in ' + repo + ': ' + problem);
-    postOnGithub(githubUser, repo, twitterUser, problem, url, done);
+    postOnGithub(githubUser, repo, twitterUser, problem, url, tweetID, done);
   } else {
     console.log('Invalid tweet: ' + text);
     done();
   }
 }
+
 
 var github = new GitHubAPI({
   version: '3.0.0',
@@ -45,7 +48,7 @@ github.authenticate({
   password: process.env.GITHUB_PASSWORD,
 });
 
-function postOnGithub(githubUser, repo, twitterUser, problem, twitterUrl, done) {
+function postOnGithub(githubUser, repo, twitterUser, problem, twitterUrl, tweetID, done) {
   github.issues.create({
     user: githubUser,
     repo: repo,
@@ -55,16 +58,38 @@ function postOnGithub(githubUser, repo, twitterUser, problem, twitterUrl, done) 
   }, function(err, res) {
     if (err) {
       console.log('Github error trying to do ' + twitterUrl);
+      done();
     } else {
       var issueUrl = res.html_url;
       console.log('Posted issue: ' + issueUrl);
-      postOnTwitter();
+      postOnTwitter(twitterUser, tweetID, 'created ' + issueUrl, done);
     }
-    done();
   });
 }
 
-function postOnTwitter() {
+
+var twitter = new twitterAPI({
+  consumerKey: process.env.TWITTER_CONSUMER_KEY,
+  consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+});
+function postOnTwitter(twitterUser, tweetID, text, done) {
+  twitter.statuses(
+    'update',
+    {
+      status: '@' + twitterUser + ' ' + text,
+      in_reply_to_status_id: tweetID,
+    },
+    process.env.TWITTER_ACCESS_TOKEN,
+    process.env.TWITTER_ACCESS_TOKEN_SECRET,
+    function(err, data, res) {
+      if (err) {
+        console.log('Error tweeting', err);
+      } else {
+        console.log('Tweeted', data.id_str);
+      }
+      done();
+    }
+  );
 }
 
 app.get('/', function (req, res) {
