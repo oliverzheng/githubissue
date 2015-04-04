@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.12.3",
-    "express-ifttt-webhook": "^0.2.3"
+    "express-ifttt-webhook": "^0.2.3",
+    "url-parse": "^1.0.0"
   }
 }
