@@ -1,0 +1,15 @@
+{
+  "name": "githubissue",
+  "version": "1.0.0",
+  "description": "File github issues on Twitter",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Oliver Zheng",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.12.3",
+    "express-ifttt-webhook": "^0.2.3"
+  }
+}
