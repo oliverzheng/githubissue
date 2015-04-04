@@ -4,6 +4,7 @@ var webhook = require('express-ifttt-webhook');
 var app = express();
 app.use(webhook(function (json, done) {
   console.log('Got', json);
+  done();
 }));
 
 app.get('/', function (req, res) {
