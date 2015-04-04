@@ -1,16 +1,26 @@
 var express = require('express');
 var webhook = require('express-ifttt-webhook');
 var urlParse = require('url-parse');
+var resolver = require("resolver");
 
 var app = express();
 app.use(webhook(function (json, done) {
   console.log('Got request: ' + json.description);
-  var url = urlParse(json.description);
-  var pathParts = url.pathname.split('/');
+  resolver.resolve(json.description, function(err, url) {
+    if (err) {
+      console.log('Got error trying to resolve: ', json.description);
+      done();
+    } else {
+      processTweet(url, json.title, done);
+    }
+  });
+}));
+
+function processTweet(url, text, done) {
+  var pathParts = urlParse(url).pathname.split('/');
   var author = pathParts[1];
   var tweetID = pathParts[3];
 
-  var text = json.title;
   var re = /\s+(\S+\/\S+)\s+(.*)/;
   var match = re.exec(text);
   if (match !== null) {
@@ -22,7 +32,7 @@ app.use(webhook(function (json, done) {
   }
 
   done();
-}));
+}
 
 app.get('/', function (req, res) {
   res.send('Herro');
