@@ -4,13 +4,13 @@ var urlParse = require('url-parse');
 
 var app = express();
 app.use(webhook(function (json, done) {
-  console.log('Got request: ' + json.title);
-  var url = urlParse(json.title);
+  console.log('Got request: ' + json.description);
+  var url = urlParse(json.description);
   var pathParts = url.pathname.split('/');
   var author = pathParts[1];
   var tweetID = pathParts[3];
 
-  var text = json.description;
+  var text = json.title;
   var re = /\s+(\S+\/\S+)\s+(.*)/;
   var match = re.exec(text);
   if (match !== null) {
