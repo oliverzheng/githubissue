@@ -11,6 +11,7 @@
   "dependencies": {
     "express": "^4.12.3",
     "express-ifttt-webhook": "^0.2.3",
+    "github": "^0.2.3",
     "resolver": "^0.1.12",
     "url-parse": "^1.0.0"
   }
