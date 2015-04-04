@@ -4,6 +4,7 @@ var urlParse = require('url-parse');
 
 var app = express();
 app.use(webhook(function (json, done) {
+  console.log('Got request: ' + json.title);
   var url = urlParse(json.title);
   var pathParts = url.pathname.split('/');
   var author = pathParts[1];
